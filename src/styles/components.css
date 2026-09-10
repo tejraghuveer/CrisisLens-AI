@@ -91,6 +91,27 @@
   gap: 0.5rem;
 }
 
+.btn-theme-toggle {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.55rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.btn-theme-toggle:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
 /* --------------------------------------------------------------------------
    2. Verify Claim Screen (Hero & Primary Experience)
    -------------------------------------------------------------------------- */

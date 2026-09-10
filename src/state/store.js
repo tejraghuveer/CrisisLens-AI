@@ -33,6 +33,14 @@ class StateStore {
     this.reviewQueue = [];
     this.reviewHistory = [];
 
+    // Theme Management ('light' | 'dark')
+    const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('crisislens_theme') : null;
+    const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.theme);
+    }
+
     // Subscribers
     this.listeners = new Set();
 
@@ -43,6 +51,29 @@ class StateStore {
 
     // Bootstrap initial claims into review queue if high severity
     this.bootstrapState();
+  }
+
+  toggleTheme() {
+    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.theme);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('crisislens_theme', this.theme);
+    }
+    this.notify();
+  }
+
+  setTheme(theme) {
+    if (theme !== 'light' && theme !== 'dark') return;
+    this.theme = theme;
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.theme);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('crisislens_theme', this.theme);
+    }
+    this.notify();
   }
 
   bootstrapState() {

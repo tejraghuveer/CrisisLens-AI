@@ -175,17 +175,19 @@ export class ProvenanceGraphRenderer {
     svg.setAttribute('height', '100%');
     svg.style.overflow = 'visible';
 
+    const isDark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
+
     // Defs for arrows and gradients
     const defs = document.createElementNS(svgNS, 'defs');
     defs.innerHTML = `
       <marker id="arrow-supports" viewBox="0 0 10 10" refX="15" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="${isDark ? '#22c55e' : '#16a34a'}" />
       </marker>
       <marker id="arrow-contradicts" viewBox="0 0 10 10" refX="15" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444" />
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="${isDark ? '#ef4444' : '#dc2626'}" />
       </marker>
       <marker id="arrow-default" viewBox="0 0 10 10" refX="15" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="${isDark ? '#64748b' : '#94a3b8'}" />
       </marker>
     `;
     svg.appendChild(defs);
@@ -206,14 +208,14 @@ export class ProvenanceGraphRenderer {
       const d = `M ${sourceCoord.x} ${sourceCoord.y} C ${c1x} ${sourceCoord.y}, ${c2x} ${targetCoord.y}, ${targetCoord.x} ${targetCoord.y}`;
       path.setAttribute('d', d);
 
-      let strokeColor = '#cbd5e1';
+      let strokeColor = isDark ? '#334155' : '#cbd5e1';
       let marker = 'url(#arrow-default)';
 
       if (link.relation === 'SUPPORTS') {
-        strokeColor = '#16a34a';
+        strokeColor = isDark ? '#22c55e' : '#16a34a';
         marker = 'url(#arrow-supports)';
       } else if (link.relation === 'CONTRADICTS') {
-        strokeColor = '#dc2626';
+        strokeColor = isDark ? '#ef4444' : '#dc2626';
         marker = 'url(#arrow-contradicts)';
       }
 
@@ -247,26 +249,26 @@ export class ProvenanceGraphRenderer {
       rect.setAttribute('height', h);
       rect.setAttribute('rx', 6);
 
-      let fillColor = '#ffffff';
-      let strokeColor = '#e2e8f0';
-      let labelColor = '#0f172a';
-      let subColor = '#64748b';
+      let fillColor = isDark ? '#111827' : '#ffffff';
+      let strokeColor = isDark ? '#334155' : '#e2e8f0';
+      let labelColor = isDark ? '#f8fafc' : '#0f172a';
+      let subColor = isDark ? '#94a3b8' : '#64748b';
 
       if (node.type === 'CLAIM') {
-        fillColor = '#f8fafc';
-        strokeColor = '#64748b';
+        fillColor = isDark ? '#1e293b' : '#f8fafc';
+        strokeColor = isDark ? '#475569' : '#64748b';
       } else if (node.type === 'ASSERTION') {
-        fillColor = '#f8fafc';
-        strokeColor = '#cbd5e1';
+        fillColor = isDark ? '#1e293b' : '#f8fafc';
+        strokeColor = isDark ? '#475569' : '#cbd5e1';
       } else if (node.type === 'EVIDENCE') {
-        fillColor = node.stance === 'SUPPORTS' ? '#f0fdf4' : node.stance === 'CONTRADICTS' ? '#fef2f2' : '#f8fafc';
-        strokeColor = node.stance === 'SUPPORTS' ? '#16a34a' : node.stance === 'CONTRADICTS' ? '#dc2626' : '#cbd5e1';
+        fillColor = node.stance === 'SUPPORTS' ? (isDark ? 'rgba(34, 197, 94, 0.12)' : '#f0fdf4') : node.stance === 'CONTRADICTS' ? (isDark ? 'rgba(239, 68, 68, 0.12)' : '#fef2f2') : (isDark ? '#1e293b' : '#f8fafc');
+        strokeColor = node.stance === 'SUPPORTS' ? (isDark ? '#22c55e' : '#16a34a') : node.stance === 'CONTRADICTS' ? (isDark ? '#ef4444' : '#dc2626') : (isDark ? '#475569' : '#cbd5e1');
       } else if (node.type === 'SOURCE') {
-        fillColor = '#eff6ff';
+        fillColor = isDark ? 'rgba(59, 130, 246, 0.12)' : '#eff6ff';
         strokeColor = '#3b82f6';
       } else if (node.type === 'ASSESSMENT') {
-        fillColor = '#f0fdf4';
-        strokeColor = '#16a34a';
+        fillColor = isDark ? 'rgba(34, 197, 94, 0.12)' : '#f0fdf4';
+        strokeColor = isDark ? '#22c55e' : '#16a34a';
       }
 
       rect.setAttribute('fill', fillColor);

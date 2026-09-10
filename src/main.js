@@ -43,6 +43,11 @@ window.__navigateTo = function(viewName) {
   store.setView(viewName);
 };
 
+// Theme Toggle Dispatcher
+window.__toggleTheme = function() {
+  store.toggleTheme();
+};
+
 // Location-Aware Prioritization Handlers (Requirement 8, 9, 16, 17)
 window.__toggleLocationAwarePriority = async function() {
   if (store.locationPriorityEnabled) {

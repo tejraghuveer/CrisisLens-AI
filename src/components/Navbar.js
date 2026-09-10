@@ -7,6 +7,7 @@ import { store } from '../state/store.js';
 export function renderNavbar() {
   const active = store.currentView;
   const reviewCount = store.reviewQueue.length;
+  const isDark = store.theme === 'dark';
 
   return `
     <header class="navbar-header">
@@ -35,6 +36,15 @@ export function renderNavbar() {
         </nav>
 
         <div class="navbar-actions">
+          <button 
+            type="button" 
+            class="btn-theme-toggle" 
+            onclick="window.__toggleTheme()" 
+            title="${isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}" 
+            aria-label="Toggle theme"
+          >
+            ${isDark ? '☀️' : '🌙'}
+          </button>
           <span class="sim-tag" title="Synthetic simulation dataset for hackathon evaluation">Demo Data</span>
         </div>
       </div>
