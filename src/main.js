@@ -43,6 +43,39 @@ window.__navigateTo = function(viewName) {
   store.setView(viewName);
 };
 
+// Location-Aware Prioritization Handlers (Requirement 8, 9, 16, 17)
+window.__toggleLocationAwarePriority = async function() {
+  if (store.locationPriorityEnabled) {
+    store.toggleLocationPriority(false);
+  } else {
+    await store.toggleLocationPriority(true);
+  }
+};
+
+window.__requestBrowserLocation = async function() {
+  store.showToast('Requesting browser location access...', 'info');
+  const res = await locationService.requestBrowserLocation();
+  if (res.success) {
+    store.locationPriorityEnabled = true;
+    store.showToast('Browser location acquired. Priority updated using proximity.', 'success');
+  } else {
+    store.showToast(res.error || 'Location unavailable — showing general crisis priority.', 'info');
+  }
+};
+
+window.__selectDemoLocation = function(locId) {
+  store.setDemoLocation(locId);
+};
+
+window.__clearLocationPriority = function() {
+  locationService.clearLocation();
+  store.toggleLocationPriority(false);
+};
+
+window.__setPriorityFilter = function(filter) {
+  store.setPriorityFilter(filter);
+};
+
 // Handle Claim Form Submission
 window.__handleVerificationSubmit = async function(event) {
   event.preventDefault();
@@ -61,10 +94,26 @@ window.__handleVerificationSubmit = async function(event) {
   if (btn) btn.disabled = true;
   if (progressBox) progressBox.classList.add('active');
 
+  // Resolve approximate coordinates if known location name
+  let latitude = null;
+  let longitude = null;
+  const locLower = (location || '').toLowerCase();
+  if (locLower.includes('vijayawada')) { latitude = 16.5062; longitude = 80.6480; }
+  else if (locLower.includes('visakhapatnam') || locLower.includes('vizag')) { latitude = 17.6868; longitude = 83.2185; }
+  else if (locLower.includes('guntur')) { latitude = 16.3067; longitude = 80.4365; }
+  else if (locLower.includes('hyderabad')) { latitude = 17.3850; longitude = 78.4867; }
+  else if (locLower.includes('idukki')) { latitude = 9.8494; longitude = 76.9804; }
+  else if (locLower.includes('paradip')) { latitude = 20.3164; longitude = 86.6114; }
+  else if (locLower.includes('noida')) { latitude = 28.5355; longitude = 77.3910; }
+  else if (locLower.includes('pune')) { latitude = 18.5204; longitude = 73.8567; }
+
   await store.runVerification({
     text,
     category,
     location,
+    locationName: location,
+    latitude,
+    longitude,
     severity,
     timestamp: new Date().toISOString()
   }, (stepIndex, label) => {
@@ -85,11 +134,13 @@ window.__selectPresetClaim = function(presetId) {
     const catSelect = document.getElementById('crisis-category');
     const locInput = document.getElementById('claim-location');
     const sevSelect = document.getElementById('claim-severity');
+    const locPreview = document.getElementById('preview-claim-loc');
 
     if (txtArea) txtArea.value = preset.text;
     if (catSelect) catSelect.value = preset.category;
-    if (locInput) locInput.value = preset.location;
+    if (locInput) locInput.value = preset.locationName || preset.location;
     if (sevSelect) sevSelect.value = preset.severity;
+    if (locPreview) locPreview.textContent = preset.locationName || preset.location;
   }, 50);
 };
 
@@ -332,6 +383,14 @@ function render() {
     <main id="main-view-container">
       ${mainContentHtml}
     </main>
+    ${store.toast ? `
+      <div class="toast-container">
+        <div class="toast-message ${store.toast.type}">
+          <span>${store.toast.type === 'success' ? '✓' : 'ℹ'}</span>
+          <span>${store.toast.message}</span>
+        </div>
+      </div>
+    ` : ''}
   `;
 
   // Render Interactive Provenance Graph if in result view

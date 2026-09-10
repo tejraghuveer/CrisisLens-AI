@@ -105,6 +105,98 @@ export function renderVerificationResultView() {
         </div>
       </div>
 
+      <!-- Location-Aware Prioritization & Urgency Breakdown (Requirements 11, 12, 15) -->
+      <section class="result-section">
+        <div class="section-title-row">
+          <div>
+            <h3>Location-Aware Crisis Prioritization</h3>
+            <p>Geographic urgency and operational triage weighting relative to citizen proximity.</p>
+          </div>
+          <span class="badge-tag font-mono">
+            ${result.locationPriority ? result.locationPriority.levelIcon + ' ' + result.locationPriority.level + ' (' + result.locationPriority.priorityScore + '/100)' : 'PRIORITY N/A'}
+          </span>
+        </div>
+
+        <div class="glass-panel location-priority-result-panel p-6">
+          <div class="loc-summary-grid">
+            <div class="loc-summary-card">
+              <span class="font-mono font-xs text-tertiary">INCIDENT LOCATION</span>
+              <div class="font-bold text-lg text-primary">📍 ${claim.locationName || claim.location}</div>
+              <span class="font-mono font-xs text-secondary">Verified Disaster Sector</span>
+            </div>
+
+            <div class="loc-summary-card">
+              <span class="font-mono font-xs text-tertiary">ESTIMATED PROXIMITY</span>
+              <div class="font-bold text-lg text-cyan font-mono">
+                ${result.locationPriority ? result.locationPriority.proximityLabel : 'Distance unavailable'}
+              </div>
+              <span class="font-mono font-xs text-secondary">In-Memory Privacy Calculation</span>
+            </div>
+
+            <div class="loc-summary-card">
+              <span class="font-mono font-xs text-tertiary">URGENCY LEVEL</span>
+              <div class="font-bold text-lg font-mono" style="color: ${result.locationPriority ? result.locationPriority.levelColor : '#94a3b8'}">
+                ${result.locationPriority ? result.locationPriority.level : 'STANDARD'}
+              </div>
+              <span class="font-mono font-xs text-secondary">Priority Score: ${result.locationPriority ? result.locationPriority.priorityScore : 'N/A'}/100</span>
+            </div>
+          </div>
+
+          <!-- Why is this claim prioritized? (Requirement 12) -->
+          <div class="why-prioritized-box mt-4">
+            <div class="why-prioritized-header flex-center justify-between">
+              <div class="flex-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                <strong class="font-mono font-xs uppercase text-amber">WHY IS THIS CLAIM PRIORITIZED?</strong>
+              </div>
+              <span class="font-mono font-xs text-tertiary">Multi-factor Triage Formulation</span>
+            </div>
+
+            <p class="prioritized-rationale-text text-primary font-xs mt-2">
+              ${result.locationPriority ? result.locationPriority.rationale : 'Standard non-geospatial triage weighting.'}
+            </p>
+
+            <div class="priority-factors-breakdown-grid mt-3">
+              <div class="p-factor-box">
+                <span class="p-lbl font-mono font-xs text-tertiary">Proximity Weight (40%)</span>
+                <span class="p-val font-mono text-cyan font-bold">
+                  ${result.locationPriority && result.locationPriority.factors.proximity !== null ? result.locationPriority.factors.proximity + '/100' : 'N/A'}
+                </span>
+                <span class="p-sub font-xs text-tertiary">${result.locationPriority ? result.locationPriority.proximityLabel : 'Unavailable'}</span>
+              </div>
+              <div class="p-factor-box">
+                <span class="p-lbl font-mono font-xs text-tertiary">Severity Weight (25%)</span>
+                <span class="p-val font-mono text-crimson font-bold">
+                  ${result.locationPriority ? result.locationPriority.factors.severity + '/100' : '50/100'}
+                </span>
+                <span class="p-sub font-xs text-tertiary">${claim.severity} Urgency</span>
+              </div>
+              <div class="p-factor-box">
+                <span class="p-lbl font-mono font-xs text-tertiary">Uncertainty Weight (20%)</span>
+                <span class="p-val font-mono text-amber font-bold">
+                  ${result.locationPriority ? result.locationPriority.factors.uncertainty + '/100' : '50/100'}
+                </span>
+                <span class="p-sub font-xs text-tertiary">Triage Risk: ${assessment.uncertainty}</span>
+              </div>
+              <div class="p-factor-box">
+                <span class="p-lbl font-mono font-xs text-tertiary">Recency Weight (15%)</span>
+                <span class="p-val font-mono text-emerald font-bold">
+                  ${result.locationPriority ? result.locationPriority.factors.recency + '/100' : '50/100'}
+                </span>
+                <span class="p-sub font-xs text-tertiary">Freshness Decay</span>
+              </div>
+            </div>
+
+            <div class="priority-truth-disclaimer-alert mt-4">
+              <span class="alert-icon">⚠️</span>
+              <span class="alert-text font-xs">
+                <strong>Epistemic Guarantee:</strong> This is a prioritization and dispatch relevance score, <em>NOT a truth score</em>. Proximity determines where emergency resources and attention are urgently needed; it never influences the factual evidence verification verdict (${assessment.status}).
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Claim & Assertion Decomposition Breakdown -->
       <section class="result-section">
         <div class="section-title-row">

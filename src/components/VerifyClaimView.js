@@ -72,6 +72,40 @@ export function renderVerifyClaimView() {
               </div>
             </div>
 
+            <!-- Location-Aware Priority Context Banner (Requirement 11 & 15) -->
+            <div class="location-context-card glass-panel mb-4">
+              <div class="loc-card-header">
+                <div class="flex-center gap-2">
+                  <span class="pulse-dot ${store.locationPriorityEnabled ? 'bg-cyan' : ''}"></span>
+                  <span class="font-mono font-xs font-bold text-cyan">LOCATION-AWARE PRIORITIZATION</span>
+                </div>
+                <span class="font-mono font-xs text-tertiary">
+                  ${store.locationPriorityEnabled ? 'Active Proximity Mode' : 'General Priority Mode'}
+                </span>
+              </div>
+              <div class="loc-card-body font-xs">
+                <div class="loc-meta-grid">
+                  <div>
+                    <span class="text-tertiary">Target Location:</span>
+                    <strong class="text-primary block font-mono" id="preview-claim-loc">Idukki, Kerala</strong>
+                  </div>
+                  <div>
+                    <span class="text-tertiary">Proximity Status:</span>
+                    <strong class="text-cyan block font-mono" id="preview-distance-lbl">
+                      ${store.locationPriorityEnabled ? 'Evaluated Relative to Your Baseline' : 'Location Not Set (General Priority)'}
+                    </strong>
+                  </div>
+                  <div>
+                    <span class="text-tertiary">Priority Impact:</span>
+                    <strong class="text-amber block font-mono" id="preview-priority-lbl">Urgency & Triage Only</strong>
+                  </div>
+                </div>
+                <div class="truth-distinction-note mt-2">
+                  ⚠️ <em>Proximity affects priority and relevance only. It does not determine whether a claim is true or false.</em>
+                </div>
+              </div>
+            </div>
+
             <div class="form-submit-row">
               <button type="submit" class="btn btn-primary btn-lg" id="btn-run-verify" ${isVerifying ? 'disabled' : ''}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>

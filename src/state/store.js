@@ -9,6 +9,8 @@ import { EvidenceScorer } from '../engine/evidenceScorer.js';
 import { ConfidenceEngine } from '../engine/confidenceEngine.js';
 import { BiasCheckService } from '../engine/biasCheck.js';
 import { NarrativeClusterer } from '../engine/narrativeClusterer.js';
+import { GeospatialPriorityEngine } from '../engine/geospatialPriorityEngine.js';
+import { locationService } from '../services/locationService.js';
 
 class StateStore {
   constructor() {
@@ -22,12 +24,22 @@ class StateStore {
     this.isVerifying = false;
     this.verificationStep = 0; // 0..5 pipeline progress
 
+    // Location-Aware Prioritization State (Privacy: in-memory only)
+    this.locationPriorityEnabled = false;
+    this.priorityFilter = 'ALL'; // 'ALL', 'NEAR_ME', 'HIGH_PRIORITY', 'CRITICAL'
+    this.toast = null; // { message, type, id }
+
     // Human Review Queue
     this.reviewQueue = [];
     this.reviewHistory = [];
 
     // Subscribers
     this.listeners = new Set();
+
+    // Listen to location changes
+    locationService.subscribe(() => {
+      this.notify();
+    });
 
     // Bootstrap initial claims into review queue if high severity
     this.bootstrapState();
@@ -82,9 +94,85 @@ class StateStore {
     this.notify();
   }
 
+  showToast(message, type = 'info') {
+    this.toast = {
+      id: Date.now(),
+      message,
+      type
+    };
+    this.notify();
+    setTimeout(() => {
+      if (this.toast && this.toast.id) {
+        this.dismissToast();
+      }
+    }, 4000);
+  }
+
+  dismissToast() {
+    this.toast = null;
+    this.notify();
+  }
+
+  async toggleLocationPriority(enabled) {
+    this.locationPriorityEnabled = Boolean(enabled);
+    if (this.locationPriorityEnabled) {
+      const userLoc = locationService.getUserLocation();
+      if (!userLoc) {
+        await locationService.requestBrowserLocation();
+      }
+      this.showToast('Priority updated using geographic proximity.', 'success');
+    } else {
+      this.showToast('Location-aware priority disabled. Showing general crisis priority.', 'info');
+    }
+    this.notify();
+  }
+
+  setDemoLocation(locationId) {
+    const success = locationService.setDemoLocation(locationId);
+    if (success) {
+      this.locationPriorityEnabled = true;
+      const loc = locationService.getUserLocation();
+      this.showToast(`Active demo location set to ${loc.locationName}. Priority updated using proximity.`, 'success');
+    }
+    this.notify();
+  }
+
+  setPriorityFilter(filter) {
+    this.priorityFilter = filter;
+    this.notify();
+  }
+
+  getPrioritizedClaims() {
+    const userLoc = this.locationPriorityEnabled ? locationService.getUserLocation() : null;
+
+    const evaluated = this.claims.map(claim => {
+      const priority = GeospatialPriorityEngine.evaluatePriority(claim, userLoc);
+      return {
+        ...claim,
+        priority
+      };
+    });
+
+    if (this.locationPriorityEnabled) {
+      // Sort primarily by calculated priority score (highest first)
+      evaluated.sort((a, b) => b.priority.priorityScore - a.priority.priorityScore);
+
+      // Filtering (never hides distant high-severity claims when filter is ALL)
+      if (this.priorityFilter === 'NEAR_ME') {
+        return evaluated.filter(c => c.priority.distanceKm !== null && c.priority.distanceKm <= 100);
+      } else if (this.priorityFilter === 'CRITICAL') {
+        return evaluated.filter(c => c.priority.level === 'CRITICAL');
+      } else if (this.priorityFilter === 'HIGH_PRIORITY') {
+        return evaluated.filter(c => c.priority.level === 'CRITICAL' || c.priority.level === 'HIGH');
+      }
+    }
+
+    return evaluated;
+  }
+
   /**
    * Execute End-to-End Verification Pipeline
-   * @param {Object} claimInput { text, category, location, timestamp, severity }
+   * @param {Object} claimInput { text, category, location, timestamp, severity, latitude, longitude }
    * @param {Function} onProgress
    */
   async runVerification(claimInput, onProgress = null) {
@@ -122,7 +210,7 @@ class StateStore {
     if (onProgress) onProgress(4, 'Calculating epistemic confidence and controversy index...');
     await new Promise(r => setTimeout(r, 350));
 
-    // 4. Assess Confidence & Epistemic Uncertainty
+    // 4. Assess Confidence & Epistemic Uncertainty (TRUTH VERDICT: UNAFFECTED BY LOCATION)
     const assessment = ConfidenceEngine.assess(evaluation, claimInput);
 
     // 5. Source Diversity & Bias Audit
@@ -133,14 +221,17 @@ class StateStore {
 
     this.verificationStep = 5;
     this.notify();
-    if (onProgress) onProgress(5, 'Synthesizing auditable provenance trail...');
+    if (onProgress) onProgress(5, 'Synthesizing auditable provenance trail & location priority...');
     await new Promise(r => setTimeout(r, 300));
 
     const claimRecord = {
       id: claimInput.id || `claim-${Date.now()}`,
       text: claimInput.text,
       category: claimInput.category || 'Disaster Incident Alert',
-      location: claimInput.location || 'Reported Hazard Area',
+      location: claimInput.location || claimInput.locationName || 'Reported Hazard Area',
+      locationName: claimInput.locationName || claimInput.location || 'Reported Hazard Area',
+      latitude: claimInput.latitude ?? null,
+      longitude: claimInput.longitude ?? null,
       severity: claimInput.severity || 'HIGH',
       timestamp: claimInput.timestamp || new Date().toISOString(),
       status: assessment.status,
@@ -149,6 +240,10 @@ class StateStore {
       clusterId: cluster.id,
       verifiedAt: new Date().toISOString()
     };
+
+    // 7. Calculate Geospatial Priority (Affects urgency/ranking only, NOT truth!)
+    const userLoc = locationService.getUserLocation();
+    const locationPriority = GeospatialPriorityEngine.evaluatePriority(claimRecord, userLoc);
 
     // Add to claims repository if new
     if (!this.claims.some(c => c.text.toLowerCase() === claimRecord.text.toLowerCase())) {
@@ -182,7 +277,8 @@ class StateStore {
       evaluation,
       assessment,
       biasAudit,
-      cluster
+      cluster,
+      locationPriority
     };
 
     this.isVerifying = false;

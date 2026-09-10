@@ -33,10 +33,23 @@
 
 ---
 
-### [1:45 – 2:30] Source Bias Audit & Human-in-the-Loop Review Queue
+### [1:45 – 2:20] Innovation: Location-Aware Crisis Prioritization & Vector Map
+> *(Action: Click **"Command Center"** in Navbar. Click **"📍 Vijayawada"**).*
+> 
+> *"Here is another critical innovation: **Location-Aware Crisis Prioritization**. In a disaster, users and local responders need to know what directly threatens their community first.
+> 
+> *Notice our privacy-first design: user coordinates are computed strictly in-memory and never stored. When we select Vijayawada, the feed immediately re-ranks: the Prakasam Barrage surge jumps to **CRITICAL Priority (Nearby < 1 km)**, Guntur is **HIGH (32 km)**, while distant events like Delhi or Idukki remain accessible without cluttering local triage.
+> 
+> *On the right, our vector map displays dynamic proximity rings (0–25 km and 25–100 km).
+> 
+> *Crucially, we enforce a strict epistemic rule: **LOCATION AFFECTS PRIORITY, NOT TRUTH**. A nearby claim is not automatically true, and a distant claim is not false. Proximity dictates triage urgency, not factual assessment."*
+
+---
+
+### [2:20 – 3:00] Source Bias Audit & Human-in-the-Loop Review Queue
 > *(Action: Highlight the **Source & Bias Check** panel).*
 > 
-> *"CrisisLens also protects against overconfidence. Our automated **Bias Check Service** audits source diversity. If 75% of reports originate from anonymous social channels and zero official emergency agencies have confirmed, the system flags a Monoculture Bias Warning.*
+> *"CrisisLens also protects against overconfidence. Our automated **Bias Check Service** audits source diversity. If 75% of reports originate from anonymous social channels and zero official emergency agencies have confirmed, the system flags a Monoculture Bias Warning.
 > 
 > *(Action: Click **"Review Queue"** in Navbar).*
 > 
@@ -44,7 +57,7 @@
 
 ---
 
-### [2:30 – 3:30] The WOW Factor: Live Dynamic Crisis Simulation
+### [3:00 – 3:45] The WOW Factor: Live Dynamic Crisis Simulation
 > *(Action: Click **"Live Sim"** in Navbar).*
 > 
 > *"Now, for our primary innovation: **Dynamic Temporal Crisis Simulation**. Disaster intelligence is never static. Watch our timeline:*
@@ -117,3 +130,9 @@ Where the Controversy Index is $2 \times \min(\text{Support Mass}, \text{Contrad
 
 ### Q15: How would you deploy this in the real world?
 **Response:** *"We would deploy CrisisLens as an official intelligence sidecar inside State Disaster Management Authority (SDMA) War Rooms. Emergency desks would ingest WhatsApp and Twitter tip lines, while field officers and DEOCs use the verified counter-bulletin outputs to publish official clarifications before panic spreads."*
+
+### Q16: How does Location-Aware Prioritization preserve privacy and avoid biasing truth?
+**Response:** *"Two ironclad rules:
+1. **Zero Persistence Privacy:** User coordinates are held strictly in temporary RAM to calculate Haversine distance, never saved to localStorage, cookies, or databases. Exact coordinates are never displayed—only approximate relative labels (e.g. '~12 km from you').
+2. **Epistemic Independence:** Location affects urgency/triage priority ONLY, never the truth assessment. A nearby claim is not automatically more true, and a distant claim is not false. This prevents confirmation bias while ensuring dispatchers and citizens receive hyper-relevant alerts."*
+

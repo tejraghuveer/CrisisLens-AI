@@ -79,15 +79,19 @@ CrisisLens AI rejects unsupported boolean certainty. Every assessment produces o
 5. **Narrative Clustering Engine:** Groups viral mutations (e.g. 14 variations of a dam leak forward) to track collective velocity and geographic trajectory.
 6. **Human-in-the-Loop (HITL) Adjudication Gateway:** Automatically routes low-confidence, high-controversy, or high-severity claims to human dispatchers with an immutable audit log.
 7. **Temporal Crisis Simulator (The "WOW" Demo):** Interactive timeline demonstrating real-time verdict shifts as social chatter (10:00 AM) meets sensor logs (10:20 AM) and operational bulletins (10:30 AM).
+8. **Location-Aware Crisis Prioritization (New Innovation):** In-memory, privacy-preserving geospatial prioritization using Haversine distance and smooth decay:
+   $$\text{Priority} = 0.40 \times \text{DistanceScore} + 0.25 \times \text{SeverityScore} + 0.20 \times \text{UncertaintyScore} + 0.15 \times \text{RecencyScore}$$
+   *Guaranteed Epistemic Boundary:* Proximity strictly determines response priority and relevance; it **never** determines or alters whether a claim is true or false.
 
 ---
 
 ## 5. Technology Stack
 - **Frontend Architecture:** Modern modular Vanilla ES Modules & Component Controllers (zero bulky framework overhead, instant reaction time).
 - **Styling:** Custom Emergency Intelligence Design System (CSS Custom Properties, Dark Ops glassmorphism, responsive data density).
+- **Geospatial & Vector Mapping:** In-memory Haversine distance decay engine and SVG vector map with 0–25 km & 25–100 km proximity rings.
 - **Visualization:** Native interactive SVG Directed Acyclic Graph (DAG) with bezier link routing and dynamic DOM inspector.
 - **State Management:** Reactive Pub/Sub Store with centralized action dispatchers.
-- **Tooling:** Vite 5.4 build system & dev server.
+- **Tooling & Tests:** Vite 5.4 build system & automated unit test suite (`test/geospatial.test.js`).
 
 ---
 
@@ -96,13 +100,20 @@ CrisisLens AI rejects unsupported boolean certainty. Every assessment produces o
 crisislens/
 ├── index.html                      # Entry HTML template
 ├── package.json                    # Project configuration & scripts
+├── test/
+│   └── geospatial.test.js          # Automated unit test suite (22 unit tests)
 ├── src/
 │   ├── main.js                     # Central controller & router
+│   ├── utils/
+│   │   └── geo.js                  # Haversine distance & decay formulas
+│   ├── services/
+│   │   └── locationService.js      # Privacy-preserving browser geolocation & demo modes
 │   ├── models/
 │   │   └── types.js                # Status enums, source tiers, categories
 │   ├── data/
-│   │   └── crisisDataset.js        # Synthetic multi-scenario crisis dataset
+│   │   └── crisisDataset.js        # Synthetic multi-scenario crisis dataset with coordinates
 │   ├── engine/
+│   │   ├── geospatialPriorityEngine.js # Configurable 4-factor urgency weighting engine
 │   │   ├── claimDecomposer.js      # Assertion extraction engine
 │   │   ├── sourceProvider.js       # Abstract multi-tier source provider
 │   │   ├── evidenceScorer.js       # Transparent weighted math engine
@@ -117,8 +128,8 @@ crisislens/
 │   │   ├── Navbar.js               # Top ops navigation & status badges
 │   │   ├── LandingView.js          # Overview & stakeholder impact
 │   │   ├── VerifyClaimView.js      # Claim input & animated progress
-│   │   ├── VerificationResultView.js # Verdict hero, DAG, evidence cards
-│   │   ├── CrisisDashboardView.js  # Command center & simulated vector map
+│   │   ├── VerificationResultView.js # Verdict hero, DAG, evidence cards, location priority
+│   │   ├── CrisisDashboardView.js  # Command center, location controls, & vector map
 │   │   ├── NarrativeClusterView.js # Rumor clusters & velocity tracking
 │   │   ├── HumanReviewView.js      # HITL review queue & audit table
 │   │   ├── SimulationView.js       # Temporal crisis simulation demo

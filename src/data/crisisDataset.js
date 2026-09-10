@@ -120,12 +120,22 @@ export const SYNTHETIC_SOURCES = [
   }
 ];
 
+export const DEMO_LOCATIONS = [
+  { id: 'loc-vijayawada', name: 'Vijayawada', state: 'Andhra Pradesh', latitude: 16.5062, longitude: 80.6480 },
+  { id: 'loc-vizag', name: 'Visakhapatnam', state: 'Andhra Pradesh', latitude: 17.6868, longitude: 83.2185 },
+  { id: 'loc-guntur', name: 'Guntur', state: 'Andhra Pradesh', latitude: 16.3067, longitude: 80.4365 },
+  { id: 'loc-hyderabad', name: 'Hyderabad', state: 'Telangana', latitude: 17.3850, longitude: 78.4867 }
+];
+
 export const PRESET_CLAIMS = [
   {
     id: 'claim-preset-01',
     text: 'Mullaperiyar Dam has developed a massive breach at Spillway 3 and downstream residents must evacuate immediately.',
     category: CRISIS_CATEGORY.FLOOD_DAM,
     location: 'Idukki, Kerala',
+    locationName: 'Idukki, Kerala',
+    latitude: 9.8494,
+    longitude: 76.9804,
     timestamp: '2026-09-10T09:15:00Z',
     severity: 'CRITICAL',
     syntheticScenario: 'SCENARIO_1_DAM_BREACH',
@@ -137,6 +147,9 @@ export const PRESET_CLAIMS = [
     text: 'Cyclone Sagar eye has made landfall near Paradip Port with 220 km/h wind gusts and storm surge over 6 meters.',
     category: CRISIS_CATEGORY.CYCLONE_WEATHER,
     location: 'Paradip, Odisha',
+    locationName: 'Paradip, Odisha',
+    latitude: 20.3164,
+    longitude: 86.6114,
     timestamp: '2026-09-10T08:30:00Z',
     severity: 'HIGH',
     syntheticScenario: 'SCENARIO_2_CYCLONE_SURGE',
@@ -148,6 +161,9 @@ export const PRESET_CLAIMS = [
     text: 'Metro Rail Viaduct at Pillar 412 has suffered structural collapse after the 4.8 magnitude tremor; rescue ops ongoing.',
     category: CRISIS_CATEGORY.EARTHQUAKE_COLLAPSE,
     location: 'Sector 62, Noida Metro',
+    locationName: 'Sector 62, Noida Metro',
+    latitude: 28.5355,
+    longitude: 77.3910,
     timestamp: '2026-09-10T07:45:00Z',
     severity: 'CRITICAL',
     syntheticScenario: 'SCENARIO_3_METRO_COLLAPSE',
@@ -159,11 +175,56 @@ export const PRESET_CLAIMS = [
     text: 'Drinking water reservoir in Zone 4 is contaminated with chemical runoff following flash floods; do not consume tap water.',
     category: CRISIS_CATEGORY.CIVIL_EMERGENCY,
     location: 'Zone 4, Pune Cantonment',
+    locationName: 'Zone 4, Pune Cantonment',
+    latitude: 18.5204,
+    longitude: 73.8567,
     timestamp: '2026-09-10T06:20:00Z',
     severity: 'MEDIUM',
     syntheticScenario: 'SCENARIO_4_WATER_CONTAMINATION',
     clusterId: 'cluster-water-contamination',
     description: 'Unverified rumor regarding municipal supply contamination causing panic water-can buying.'
+  },
+  {
+    id: 'claim-preset-05',
+    text: 'Prakasam Barrage flood gates jammed under sudden 6.5 lakh cusecs surge; Krishna river inundating Bhavanipuram and low-lying Vijayawada wards.',
+    category: CRISIS_CATEGORY.FLOOD_DAM,
+    location: 'Vijayawada, Andhra Pradesh',
+    locationName: 'Vijayawada, Andhra Pradesh',
+    latitude: 16.5062,
+    longitude: 80.6480,
+    timestamp: '2026-09-10T09:40:00Z',
+    severity: 'CRITICAL',
+    syntheticScenario: 'SCENARIO_5_KRISHNA_FLOOD',
+    clusterId: 'cluster-krishna-flood',
+    description: 'Breaking flood warning regarding Krishna River discharge and barrage counterweight counter-measures.'
+  },
+  {
+    id: 'claim-preset-06',
+    text: 'Industrial corridor ammonia gas cylinder leakage alert triggered at coastal Visakhapatnam export processing zone; sirens sounding.',
+    category: CRISIS_CATEGORY.CIVIL_EMERGENCY,
+    location: 'Visakhapatnam, Andhra Pradesh',
+    locationName: 'Visakhapatnam, Andhra Pradesh',
+    latitude: 17.6868,
+    longitude: 83.2185,
+    timestamp: '2026-09-10T08:55:00Z',
+    severity: 'HIGH',
+    syntheticScenario: 'SCENARIO_6_VIZAG_GAS',
+    clusterId: 'cluster-vizag-alert',
+    description: 'Exaggerated social panic stemming from routine fire safety mock drill at industrial container terminal.'
+  },
+  {
+    id: 'claim-preset-07',
+    text: 'Canal retaining breach reported near Guntur rural agricultural belts; secondary roads submerged.',
+    category: CRISIS_CATEGORY.FLOOD_DAM,
+    location: 'Guntur, Andhra Pradesh',
+    locationName: 'Guntur, Andhra Pradesh',
+    latitude: 16.3067,
+    longitude: 80.4365,
+    timestamp: '2026-09-10T08:10:00Z',
+    severity: 'MEDIUM',
+    syntheticScenario: 'SCENARIO_7_GUNTUR_CANAL',
+    clusterId: 'cluster-guntur-canal',
+    description: 'Waterlogging on local access roads erroneously amplified as major irrigation canal breach.'
   }
 ];
 
