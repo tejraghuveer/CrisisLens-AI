@@ -1,6 +1,6 @@
 /**
- * CrisisLens AI — Human Review Queue & Adjudication Workspace
- * Requirement 13: Human-in-the-Loop Oversight & Audit Trail
+ * CrisisLens AI — Minimalist Human Review View
+ * Simple triage queue and clean adjudication modal
  */
 
 import { store } from '../state/store.js';
@@ -10,149 +10,119 @@ export function renderHumanReviewView() {
   const history = store.reviewHistory;
 
   return `
-    <div class="review-page container animate-fade-in">
-      <div class="page-header-bar">
+    <div class="review-page container-narrow animate-fade-in">
+      <div class="review-header-simple mb-6">
         <div>
-          <div class="page-badge">
-            <span class="simulation-pill"><span class="pulse-dot"></span> HUMAN-IN-THE-LOOP (HITL) GATEWAY</span>
-            <span class="font-mono text-tertiary">Operational Safety & Accountability</span>
-          </div>
-          <h1>Human Review & Adjudication Queue</h1>
-          <p>
-            AI is decision support, NOT an unquestionable authority. High-severity claims, high source conflicts, 
-            and low-confidence edge cases are routed here for mandatory human operator sign-off before downstream dissemination.
+          <h2>Human Review Queue</h2>
+          <p class="text-tertiary font-sm">
+            Cases flagged for human oversight due to high controversy, low evidence, or critical severity.
           </p>
         </div>
-
-        <div class="queue-counter-badge font-mono">
-          <span class="pulse-dot"></span>
-          Pending Adjudication: ${queue.length}
-        </div>
+        <span class="font-xs font-mono text-secondary">
+          Pending: <strong>${queue.length}</strong>
+        </span>
       </div>
 
-      <!-- Pending Queue Section -->
-      <section class="queue-section">
-        <div class="section-title-row">
-          <h3>Active Triage Queue (${queue.length} Pending Actions)</h3>
-          <span class="font-mono font-xs text-tertiary">Queue SLA: Priority 1 (&lt; 5 mins)</span>
-        </div>
+      <!-- Simple Queue List -->
+      <div class="queue-simple-section mb-8">
+        <h3 class="font-sm font-semibold text-secondary mb-3">Needs Review</h3>
 
         ${queue.length === 0 ? `
-          <div class="glass-panel empty-queue-card text-center py-8">
-            <div class="empty-icon text-emerald">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <h4>Queue All Clear</h4>
-            <p class="text-tertiary">No crisis claims currently exceed the automated uncertainty or controversy threshold.</p>
+          <div class="card p-6 text-center">
+            <p class="text-tertiary font-sm">Queue all clear. No claims currently require human sign-off.</p>
           </div>
         ` : `
-          <div class="queue-items-list">
+          <div class="queue-list-clean">
             ${queue.map(item => `
-              <div class="glass-panel review-card">
-                <div class="review-card-header">
-                  <div class="review-meta-left">
-                    <span class="status-badge ${item.status ? item.status.replace(' ', '_') : 'UNVERIFIED'}">
-                      AI: ${item.status}
-                    </span>
-                    <span class="badge-sev ${item.severity}">${item.severity}</span>
-                    <span class="font-mono font-xs text-tertiary">📍 ${item.location}</span>
-                  </div>
-                  <div class="review-meta-right font-mono font-xs text-cyan">
-                    Confidence: ${item.confidence}% • Uncertainty: ${item.uncertainty}
+              <div class="queue-item-row card">
+                <div class="queue-main-info">
+                  <h4 class="font-sm font-medium text-primary mb-1">"${item.claimText}"</h4>
+                  <div class="queue-meta-row font-xs text-tertiary">
+                    <span>Reason: <strong class="text-secondary">${item.reason}</strong></span>
+                    <span>•</span>
+                    <span>Confidence: <strong>${item.confidence}%</strong></span>
+                    <span>•</span>
+                    <span>Priority: <strong>${item.severity}</strong></span>
+                    <span>•</span>
+                    <span>📍 ${item.location}</span>
                   </div>
                 </div>
 
-                <h3 class="review-claim-text">"${item.claimText}"</h3>
-
-                <div class="triage-trigger-alert">
-                  <span class="trigger-label font-mono font-xs font-bold text-amber">TRIGGER REASON:</span>
-                  <span class="trigger-text">${item.reason}</span>
-                </div>
-
-                <!-- Adjudication Action Toolbar -->
-                <div class="adjudication-actions-box">
-                  <span class="action-caption font-mono font-xs text-tertiary">OPERATOR ADJUDICATION:</span>
-                  <div class="action-buttons-group">
-                    <button class="btn btn-primary btn-sm" onclick="window.__openAdjudicationModal('${item.id}', 'CONFIRM')">
-                      ✓ Confirm AI Assessment
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="window.__openAdjudicationModal('${item.id}', 'REQUEST_EVIDENCE')">
-                      🔍 Request Sensor Logs
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="window.__openAdjudicationModal('${item.id}', 'OVERRULE')">
-                      ✕ Overrule / Refute
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="window.__openAdjudicationModal('${item.id}', 'MARK_UNRESOLVED')">
-                      ⏱ Mark Unresolved
-                    </button>
-                  </div>
+                <div class="queue-action-col">
+                  <button class="btn btn-secondary btn-sm" onclick="window.__openAdjudicationModal('${item.id}', 'REVIEW')">
+                    Review
+                  </button>
                 </div>
               </div>
             `).join('')}
           </div>
         `}
-      </section>
+      </div>
 
-      <!-- Completed Audit Log History -->
-      <section class="audit-history-section mt-8">
-        <div class="section-title-row">
-          <h3>Forensic Adjudication Audit Log (${history.length} Records)</h3>
-          <span class="font-mono font-xs text-tertiary">Immutable Operational Record</span>
-        </div>
-
-        ${history.length === 0 ? `
-          <div class="glass-panel p-6 text-center text-tertiary font-mono font-xs">
-            No historical human adjudications logged in this session yet.
-          </div>
-        ` : `
-          <div class="audit-table-wrapper glass-panel">
-            <table class="audit-table">
+      <!-- Clean Audit History Table -->
+      ${history.length > 0 ? `
+        <div class="history-clean-section mt-8">
+          <h3 class="font-sm font-semibold text-secondary mb-3">Review History</h3>
+          <div class="card overflow-hidden">
+            <table class="simple-table font-xs">
               <thead>
                 <tr>
-                  <th>Timestamp</th>
-                  <th>Claim Statement</th>
-                  <th>Prior AI Status</th>
-                  <th>Human Decision</th>
-                  <th>Reviewer Notes</th>
-                  <th>Adjudicator</th>
+                  <th>Time</th>
+                  <th>Claim</th>
+                  <th>Decision</th>
+                  <th>Notes</th>
                 </tr>
               </thead>
               <tbody>
-                ${history.map(record => `
+                ${history.map(h => `
                   <tr>
-                    <td class="font-mono font-xs text-tertiary">${new Date(record.resolvedAt).toLocaleTimeString()}</td>
-                    <td class="claim-snippet font-xs">"${record.claimText.substring(0, 50)}..."</td>
-                    <td><span class="status-badge ${record.previousStatus.replace(' ', '_')}">${record.previousStatus}</span></td>
-                    <td><span class="font-mono font-bold text-cyan">${record.actionTaken}</span></td>
-                    <td class="font-xs text-secondary">${record.reviewerNotes || 'Standard operating clearance'}</td>
-                    <td class="font-mono font-xs text-tertiary">${record.reviewer}</td>
+                    <td class="font-mono text-tertiary">${new Date(h.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td>"${h.claimText.substring(0, 45)}..."</td>
+                    <td><strong class="text-primary">${h.actionTaken}</strong></td>
+                    <td class="text-secondary">${h.reviewerNotes || 'Reviewed'}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
-        `}
-      </section>
+        </div>
+      ` : ''}
 
-      <!-- Adjudication Modal Container -->
-      <div id="adjudication-modal" class="modal-backdrop" style="display: none;">
-        <div class="modal-dialog glass-panel">
-          <div class="modal-header">
-            <h4 id="modal-adjudication-title">Human Adjudication Sign-Off</h4>
-            <button class="btn-close" onclick="window.__closeAdjudicationModal()">×</button>
+      <!-- Simple Adjudication Modal -->
+      <div id="adjudication-modal" class="clean-modal-backdrop" style="display: none;">
+        <div class="clean-modal card">
+          <div class="modal-header-simple">
+            <h4 id="modal-adjudication-title">Review Claim</h4>
+            <button class="btn-close-sm" onclick="window.__closeAdjudicationModal()">×</button>
           </div>
-          <div class="modal-body">
-            <p id="modal-claim-summary" class="font-mono font-xs text-tertiary"></p>
-            <div class="form-group mt-4">
-              <label class="form-label">Reviewer Operational Justification / Notes</label>
-              <textarea id="modal-reviewer-notes" rows="3" class="form-textarea" placeholder="Explain basis for this manual adjudication decision (e.g. Cross-verified with DEOC radar logs at 09:32 IST)..."></textarea>
+
+          <div class="modal-body-simple font-xs">
+            <div class="mb-3">
+              <span class="text-tertiary block mb-1">Claim:</span>
+              <p id="modal-claim-summary" class="font-sm text-primary font-medium"></p>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="window.__closeAdjudicationModal()">Cancel</button>
-            <button class="btn btn-primary" id="btn-submit-adjudication" onclick="window.__submitAdjudication()">
-              Submit & Commit Audit Record
-            </button>
+
+            <div class="mb-4">
+              <label class="text-tertiary block mb-1" for="modal-reviewer-notes">Reviewer notes / rationale:</label>
+              <textarea 
+                id="modal-reviewer-notes" 
+                rows="2" 
+                class="clean-textarea-sm" 
+                placeholder="Optional notes for audit trail..."
+              ></textarea>
+            </div>
+
+            <div class="adjudication-buttons-row">
+              <button class="btn btn-primary btn-sm" onclick="window.__submitAdjudicationWithAction('CONFIRM')">
+                Confirm Assessment
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="window.__submitAdjudicationWithAction('OVERRULE')">
+                Overrule
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="window.__submitAdjudicationWithAction('REQUEST_EVIDENCE')">
+                Request Evidence
+              </button>
+            </div>
           </div>
         </div>
       </div>

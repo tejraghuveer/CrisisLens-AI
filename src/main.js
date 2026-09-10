@@ -164,7 +164,7 @@ window.__loadClusterIntoVerify = function(clusterId) {
 
 // Human Adjudication Modal Handlers
 window.__openAdjudicationModal = function(reviewId, action) {
-  pendingAdjudication = { id: reviewId, action };
+  pendingAdjudication = { id: reviewId, action: action || 'REVIEW' };
   const modal = document.getElementById('adjudication-modal');
   const title = document.getElementById('modal-adjudication-title');
   const summary = document.getElementById('modal-claim-summary');
@@ -172,8 +172,8 @@ window.__openAdjudicationModal = function(reviewId, action) {
 
   const item = store.reviewQueue.find(q => q.id === reviewId);
   if (modal && item) {
-    title.textContent = `Operator Action: ${action.replace('_', ' ')}`;
-    summary.textContent = `Claim [${item.severity}]: "${item.claimText}" (${item.location})`;
+    if (title) title.textContent = `Review Claim: ${item.severity || 'ALERT'}`;
+    if (summary) summary.textContent = `"${item.claimText}" (${item.location}) — AI verdict: ${item.status || 'UNVERIFIED'}`;
     if (notes) notes.value = '';
     modal.style.display = 'flex';
   }
@@ -190,6 +190,41 @@ window.__submitAdjudication = function() {
   if (pendingAdjudication.id) {
     store.resolveReview(pendingAdjudication.id, pendingAdjudication.action, notes);
     window.__closeAdjudicationModal();
+  }
+};
+
+window.__submitAdjudicationWithAction = function(action) {
+  const notes = document.getElementById('modal-reviewer-notes')?.value?.trim();
+  if (pendingAdjudication.id) {
+    store.resolveReview(pendingAdjudication.id, action, notes);
+    window.__closeAdjudicationModal();
+  }
+};
+
+// Drawer Toggles for Minimalist Result View
+window.__toggleConfidenceDrawer = function() {
+  const drawer = document.getElementById('confidence-drawer');
+  if (drawer) {
+    drawer.style.display = (drawer.style.display === 'none' || drawer.style.display === '') ? 'block' : 'none';
+  }
+};
+
+window.__toggleGraphDrawer = function() {
+  const wrapper = document.getElementById('provenance-graph-wrapper');
+  if (wrapper) {
+    const isHidden = (wrapper.style.display === 'none' || wrapper.style.display === '');
+    wrapper.style.display = isHidden ? 'block' : 'none';
+    if (isHidden && store.activeVerification) {
+      setTimeout(() => {
+        const graphContainer = document.getElementById('provenance-graph-container');
+        if (graphContainer) {
+          const graphData = ProvenanceGraphRenderer.buildGraphData(store.activeVerification);
+          ProvenanceGraphRenderer.render(graphContainer, graphData, (node) => {
+            showNodeDetailsInInspector(node);
+          });
+        }
+      }, 50);
+    }
   }
 };
 
@@ -350,10 +385,8 @@ function render() {
   let mainContentHtml = '';
 
   switch (store.currentView) {
-    case 'landing':
-      mainContentHtml = renderLandingView();
-      break;
     case 'verify':
+    case 'landing':
       mainContentHtml = renderVerifyClaimView();
       break;
     case 'result':
@@ -371,11 +404,12 @@ function render() {
     case 'simulation':
       mainContentHtml = renderSimulationView(currentSimState);
       break;
+    case 'about':
     case 'methodology':
       mainContentHtml = renderMethodologyView();
       break;
     default:
-      mainContentHtml = renderLandingView();
+      mainContentHtml = renderVerifyClaimView();
   }
 
   app.innerHTML = `
@@ -414,5 +448,5 @@ render();
 
 // Auto-run Mullaperiyar preset in background on startup so Result view is immediately demo-ready
 store.runVerification(PRESET_CLAIMS[0]).then(() => {
-  store.setView('landing');
+  store.setView('verify');
 });

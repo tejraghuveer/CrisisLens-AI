@@ -206,19 +206,19 @@ export class ProvenanceGraphRenderer {
       const d = `M ${sourceCoord.x} ${sourceCoord.y} C ${c1x} ${sourceCoord.y}, ${c2x} ${targetCoord.y}, ${targetCoord.x} ${targetCoord.y}`;
       path.setAttribute('d', d);
 
-      let strokeColor = 'rgba(100, 116, 139, 0.35)';
+      let strokeColor = '#cbd5e1';
       let marker = 'url(#arrow-default)';
 
       if (link.relation === 'SUPPORTS') {
-        strokeColor = 'rgba(16, 185, 129, 0.6)';
+        strokeColor = '#16a34a';
         marker = 'url(#arrow-supports)';
       } else if (link.relation === 'CONTRADICTS') {
-        strokeColor = 'rgba(239, 68, 68, 0.6)';
+        strokeColor = '#dc2626';
         marker = 'url(#arrow-contradicts)';
       }
 
       path.setAttribute('stroke', strokeColor);
-      path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke-width', '1.5');
       path.setAttribute('fill', 'none');
       path.setAttribute('marker-end', marker);
       linksGroup.appendChild(path);
@@ -245,26 +245,28 @@ export class ProvenanceGraphRenderer {
       rect.setAttribute('y', -h / 2);
       rect.setAttribute('width', w);
       rect.setAttribute('height', h);
-      rect.setAttribute('rx', 8);
+      rect.setAttribute('rx', 6);
 
-      let fillColor = '#101828';
-      let strokeColor = 'rgba(255, 255, 255, 0.15)';
+      let fillColor = '#ffffff';
+      let strokeColor = '#e2e8f0';
+      let labelColor = '#0f172a';
+      let subColor = '#64748b';
 
       if (node.type === 'CLAIM') {
-        fillColor = '#1e1b4b';
-        strokeColor = '#6366f1';
+        fillColor = '#f8fafc';
+        strokeColor = '#64748b';
       } else if (node.type === 'ASSERTION') {
-        fillColor = '#0f172a';
-        strokeColor = '#0284c7';
+        fillColor = '#f8fafc';
+        strokeColor = '#cbd5e1';
       } else if (node.type === 'EVIDENCE') {
-        fillColor = node.stance === 'SUPPORTS' ? 'rgba(16, 185, 129, 0.15)' : node.stance === 'CONTRADICTS' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)';
-        strokeColor = node.stance === 'SUPPORTS' ? '#10b981' : node.stance === 'CONTRADICTS' ? '#ef4444' : '#06b6d4';
+        fillColor = node.stance === 'SUPPORTS' ? '#f0fdf4' : node.stance === 'CONTRADICTS' ? '#fef2f2' : '#f8fafc';
+        strokeColor = node.stance === 'SUPPORTS' ? '#16a34a' : node.stance === 'CONTRADICTS' ? '#dc2626' : '#cbd5e1';
       } else if (node.type === 'SOURCE') {
-        fillColor = '#172554';
+        fillColor = '#eff6ff';
         strokeColor = '#3b82f6';
       } else if (node.type === 'ASSESSMENT') {
-        fillColor = '#022c22';
-        strokeColor = '#10b981';
+        fillColor = '#f0fdf4';
+        strokeColor = '#16a34a';
       }
 
       rect.setAttribute('fill', fillColor);
@@ -277,10 +279,10 @@ export class ProvenanceGraphRenderer {
       textLabel.setAttribute('x', 0);
       textLabel.setAttribute('y', -4);
       textLabel.setAttribute('text-anchor', 'middle');
-      textLabel.setAttribute('fill', '#ffffff');
+      textLabel.setAttribute('fill', labelColor);
       textLabel.setAttribute('font-size', '11');
       textLabel.setAttribute('font-weight', '600');
-      textLabel.setAttribute('font-family', 'sans-serif');
+      textLabel.setAttribute('font-family', 'Inter, system-ui, sans-serif');
       textLabel.textContent = node.label;
       g.appendChild(textLabel);
 
@@ -289,9 +291,9 @@ export class ProvenanceGraphRenderer {
       textSub.setAttribute('x', 0);
       textSub.setAttribute('y', 14);
       textSub.setAttribute('text-anchor', 'middle');
-      textSub.setAttribute('fill', '#94a3b8');
-      textSub.setAttribute('font-size', '9');
-      textSub.setAttribute('font-family', 'sans-serif');
+      textSub.setAttribute('fill', subColor);
+      textSub.setAttribute('font-size', '10');
+      textSub.setAttribute('font-family', 'Inter, system-ui, sans-serif');
       textSub.textContent = node.sublabel;
       g.appendChild(textSub);
 

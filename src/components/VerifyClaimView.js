@@ -1,189 +1,111 @@
 /**
- * CrisisLens AI — Verify Claim View Component
+ * CrisisLens AI — Minimalist Verify Claim View (Primary Experience)
+ * "Google Search simplicity + professional fact-checking tool"
  */
 
-import { PRESET_CLAIMS } from '../data/crisisDataset.js';
+import { PRESET_CLAIMS, DEMO_LOCATIONS } from '../data/crisisDataset.js';
 import { store } from '../state/store.js';
+import { locationService } from '../services/locationService.js';
 
 export function renderVerifyClaimView() {
   const isVerifying = store.isVerifying;
   const currentStep = store.verificationStep;
+  const userLoc = locationService.getUserLocation();
 
   return `
-    <div class="verify-page container animate-fade-in">
-      <div class="page-header">
-        <div class="page-badge">
-          <span class="simulation-pill"><span class="pulse-dot"></span> PIPELINE WORKFLOW</span>
-          <span class="text-tertiary">Step 1 of 4 • Claim Ingestion</span>
-        </div>
-        <h1>Emergency Claim Verification Hub</h1>
-        <p>Submit an emergency claim or select a synthetic crisis scenario to execute the multi-tier evidence comparison engine.</p>
+    <div class="verify-page container-narrow animate-fade-in">
+      <!-- Minimal Hero Section -->
+      <div class="hero-clean text-center">
+        <h1 class="hero-clean-title">Verify before you amplify.</h1>
+        <p class="hero-clean-subtitle">
+          Evaluate crisis claims using evidence, source reliability and transparent confidence.
+        </p>
       </div>
 
-      <div class="verify-layout-grid">
-        <!-- Main Form Column -->
-        <div class="verify-form-col glass-panel">
-          <form id="verify-form" onsubmit="window.__handleVerificationSubmit(event)">
-            <div class="form-group">
-              <label for="claim-text" class="form-label">
-                <span>Emergency Claim Statement</span>
-                <span class="label-hint">Be specific regarding incident, location, and consequence</span>
-              </label>
-              <textarea 
-                id="claim-text" 
-                rows="4" 
-                class="form-textarea" 
-                placeholder="e.g. Mullaperiyar Dam has suffered a massive breach at Spillway 3 and residents must evacuate immediately."
-                required
-              >Mullaperiyar Dam has developed a massive breach at Spillway 3 and downstream residents must evacuate immediately.</textarea>
-            </div>
+      <!-- Primary Search/Verify Box -->
+      <div class="verify-box card">
+        <form id="verify-form" onsubmit="window.__handleVerificationSubmit(event)">
+          <div class="input-wrap">
+            <textarea 
+              id="claim-text" 
+              rows="3" 
+              class="clean-textarea" 
+              placeholder="Paste a crisis-related claim..."
+              required
+            >Mullaperiyar Dam has developed a massive breach at Spillway 3 and downstream residents must evacuate immediately.</textarea>
+          </div>
 
-            <div class="form-row-three">
-              <div class="form-group">
-                <label for="crisis-category" class="form-label">Crisis Category</label>
-                <select id="crisis-category" class="form-select">
-                  <option value="Flood & Dam Operations" selected>Flood & Dam Operations</option>
-                  <option value="Cyclone & Extreme Weather">Cyclone & Extreme Weather</option>
-                  <option value="Earthquake & Structural Collapse">Earthquake & Structural Collapse</option>
-                  <option value="Civil & Public Safety Alert">Civil & Public Safety Alert</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="claim-location" class="form-label">Incident Location</label>
-                <input 
-                  type="text" 
-                  id="claim-location" 
-                  class="form-input" 
-                  value="Idukki, Kerala" 
-                  placeholder="e.g. Idukki, Kerala"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="claim-severity" class="form-label">Reported Urgency / Severity</label>
-                <select id="claim-severity" class="form-select">
-                  <option value="CRITICAL" selected>CRITICAL (Immediate Life Threat)</option>
-                  <option value="HIGH">HIGH (Severe Hazard Alert)</option>
-                  <option value="MEDIUM">MEDIUM (Cautionary Advisory)</option>
-                  <option value="LOW">LOW (Informational)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Location-Aware Priority Context Banner (Requirement 11 & 15) -->
-            <div class="location-context-card glass-panel mb-4">
-              <div class="loc-card-header">
-                <div class="flex-center gap-2">
-                  <span class="pulse-dot ${store.locationPriorityEnabled ? 'bg-cyan' : ''}"></span>
-                  <span class="font-mono font-xs font-bold text-cyan">LOCATION-AWARE PRIORITIZATION</span>
-                </div>
-                <span class="font-mono font-xs text-tertiary">
-                  ${store.locationPriorityEnabled ? 'Active Proximity Mode' : 'General Priority Mode'}
+          <!-- Compact Location & Options Row -->
+          <div class="verify-options-row">
+            <div class="location-picker-inline">
+              <span class="opt-label">Location:</span>
+              <button 
+                type="button" 
+                class="btn-text ${userLoc && !userLoc.isDemo ? 'active' : ''}" 
+                onclick="window.__requestBrowserLocation()"
+                title="Use browser GPS"
+              >
+                ${userLoc && !userLoc.isDemo ? '📍 Using my location' : '📍 Use my location'}
+              </button>
+              <span class="text-divider">or</span>
+              <select 
+                class="demo-loc-select" 
+                onchange="window.__selectDemoLocation(this.value)"
+                aria-label="Select demo location"
+              >
+                <option value="">Demo location...</option>
+                ${DEMO_LOCATIONS.map(d => `
+                  <option value="${d.id}" ${userLoc && userLoc.locationName === d.name ? 'selected' : ''}>
+                    ${d.name} (${d.state})
+                  </option>
+                `).join('')}
+              </select>
+              ${userLoc ? `
+                <span class="active-loc-tag font-mono">
+                  ${userLoc.locationName}
+                  <button type="button" class="btn-clear-loc" onclick="window.__clearLocationPriority()" title="Clear location">×</button>
                 </span>
-              </div>
-              <div class="loc-card-body font-xs">
-                <div class="loc-meta-grid">
-                  <div>
-                    <span class="text-tertiary">Target Location:</span>
-                    <strong class="text-primary block font-mono" id="preview-claim-loc">Idukki, Kerala</strong>
-                  </div>
-                  <div>
-                    <span class="text-tertiary">Proximity Status:</span>
-                    <strong class="text-cyan block font-mono" id="preview-distance-lbl">
-                      ${store.locationPriorityEnabled ? 'Evaluated Relative to Your Baseline' : 'Location Not Set (General Priority)'}
-                    </strong>
-                  </div>
-                  <div>
-                    <span class="text-tertiary">Priority Impact:</span>
-                    <strong class="text-amber block font-mono" id="preview-priority-lbl">Urgency & Triage Only</strong>
-                  </div>
-                </div>
-                <div class="truth-distinction-note mt-2">
-                  ⚠️ <em>Proximity affects priority and relevance only. It does not determine whether a claim is true or false.</em>
-                </div>
-              </div>
+              ` : ''}
             </div>
 
-            <div class="form-submit-row">
-              <button type="submit" class="btn btn-primary btn-lg" id="btn-run-verify" ${isVerifying ? 'disabled' : ''}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                ${isVerifying ? 'Evaluating Multi-Source Evidence...' : 'Execute Evidence Verification'}
-              </button>
-
-              <button type="button" class="btn btn-secondary" onclick="window.__loadRandomPreset()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                Load Different Preset
-              </button>
+            <div class="location-hint-note font-xs text-tertiary">
+              Distance affects priority, not truth.
             </div>
-          </form>
+          </div>
 
-          <!-- Verification Progress Pipeline Indicator -->
-          <div id="pipeline-progress-container" class="pipeline-progress-box ${isVerifying ? 'active' : ''}">
-            <div class="progress-title-row">
-              <div class="pipeline-status-text">
-                <span class="spinner-dot"></span>
-                <span id="pipeline-status-label">Verification Pipeline Active...</span>
-              </div>
-              <span class="font-mono text-tertiary" id="pipeline-percentage">0%</span>
-            </div>
+          <div class="verify-submit-row">
+            <button type="submit" class="btn btn-primary btn-lg" id="btn-run-verify" ${isVerifying ? 'disabled' : ''}>
+              ${isVerifying ? 'Verifying evidence...' : 'Verify Claim'}
+            </button>
+          </div>
+        </form>
 
-            <div class="pipeline-steps-track">
-              <div class="step-point ${currentStep >= 1 ? 'completed' : ''} ${currentStep === 1 ? 'current' : ''}">
-                <div class="dot">1</div>
-                <span>Decompose</span>
-              </div>
-              <div class="step-point ${currentStep >= 2 ? 'completed' : ''} ${currentStep === 2 ? 'current' : ''}">
-                <div class="dot">2</div>
-                <span>Sources</span>
-              </div>
-              <div class="step-point ${currentStep >= 3 ? 'completed' : ''} ${currentStep === 3 ? 'current' : ''}">
-                <div class="dot">3</div>
-                <span>Scoring</span>
-              </div>
-              <div class="step-point ${currentStep >= 4 ? 'completed' : ''} ${currentStep === 4 ? 'current' : ''}">
-                <div class="dot">4</div>
-                <span>Confidence</span>
-              </div>
-              <div class="step-point ${currentStep >= 5 ? 'completed' : ''} ${currentStep === 5 ? 'current' : ''}">
-                <div class="dot">5</div>
-                <span>Assessment</span>
-              </div>
-            </div>
+        <!-- Minimal Clean Pipeline Progress Indicator -->
+        <div id="pipeline-progress-container" class="pipeline-clean ${isVerifying ? 'active' : ''}">
+          <div class="pipeline-flow-minimal font-xs font-mono">
+            <span class="pipe-step ${currentStep >= 1 ? 'done' : ''} ${currentStep === 1 ? 'current' : ''}">Claim</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step ${currentStep >= 2 ? 'done' : ''} ${currentStep === 2 ? 'current' : ''}">Sources</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step ${currentStep >= 3 ? 'done' : ''} ${currentStep === 3 ? 'current' : ''}">Evidence</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-step ${currentStep >= 4 ? 'done' : ''} ${currentStep === 4 ? 'current' : ''}">Assessment</span>
+          </div>
+          <div id="pipeline-status-label" class="pipeline-label-clean font-xs text-secondary mt-1">
+            Analyzing claims against multi-source evidence...
           </div>
         </div>
+      </div>
 
-        <!-- Preset Sidebar / Example Scenarios -->
-        <div class="verify-presets-col">
-          <div class="glass-panel presets-panel">
-            <div class="panel-header">
-              <span class="section-tag">SIMULATION SCENARIOS</span>
-              <h3>Demo Crisis Claims</h3>
-              <p>Select any scenario to evaluate how the engine handles varying degrees of truth, contradiction, and context:</p>
-            </div>
-
-            <div class="preset-cards-list">
-              ${PRESET_CLAIMS.map((preset, idx) => `
-                <div class="preset-card glass-panel" onclick="window.__selectPresetClaim('${preset.id}')">
-                  <div class="preset-card-top">
-                    <span class="badge-cat">${preset.category}</span>
-                    <span class="badge-sev ${preset.severity}">${preset.severity}</span>
-                  </div>
-                  <h4 class="preset-claim-text">"${preset.text}"</h4>
-                  <div class="preset-card-meta">
-                    <span>📍 ${preset.location}</span>
-                    <span class="click-prompt">Load Scenario →</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-
-            <div class="panel-footer-note">
-              <div class="simulation-pill"><span class="pulse-dot"></span> AIR-GAPPED DEMO DATA</div>
-              <p class="text-tertiary">Synthesized against realistic NDMA, CWC, IMD, and local DEOC emergency bulletins.</p>
-            </div>
-          </div>
+      <!-- Quick Preset Examples -->
+      <div class="presets-minimal text-center mt-6">
+        <span class="preset-label font-xs text-tertiary">Try examples:</span>
+        <div class="preset-chips-wrap">
+          ${PRESET_CLAIMS.slice(0, 4).map(p => `
+            <button type="button" class="preset-chip" onclick="window.__selectPresetClaim('${p.id}')">
+              ${p.locationName || p.location}: ${p.text.substring(0, 42)}...
+            </button>
+          `).join('')}
         </div>
       </div>
     </div>

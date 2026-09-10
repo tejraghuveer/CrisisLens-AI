@@ -1,156 +1,93 @@
 /**
- * CrisisLens AI — Methodology, Ethics & Technical Defense View
+ * CrisisLens AI — Minimalist About & Methodology View
+ * Clean reading layout, simple narrative clusters list, FAQ
  */
 
+import { store } from '../state/store.js';
+
 export function renderMethodologyView() {
+  const clusters = store.narrativeClusterer.getClusters();
+
   return `
-    <div class="methodology-page container animate-fade-in">
-      <div class="page-header-bar">
-        <div>
-          <div class="page-badge">
-            <span class="simulation-pill"><span class="pulse-dot"></span> TECHNICAL DEFENSE & SPECS</span>
-            <span class="font-mono text-tertiary">Epistemic Principles</span>
-          </div>
-          <h1>System Architecture & Verification Methodology</h1>
-          <p>
-            CrisisLens AI rejects black-box truth scoring. Every assessment is grounded in transparent mathematical weighting, 
-            epistemic uncertainty quantification, and human-in-the-loop accountability.
-          </p>
-        </div>
+    <div class="about-page container-narrow animate-fade-in">
+      <div class="about-header-simple mb-6 text-center">
+        <h2>About CrisisLens AI</h2>
+        <p class="font-sm text-secondary">
+          Evidence-driven crisis verification and emergency intelligence.
+        </p>
       </div>
 
-      <!-- Core Formula Cards Grid -->
-      <div class="methodology-grid">
-        <!-- Evidence Weighting Formula -->
-        <div class="glass-panel method-card">
-          <div class="method-card-header">
-            <span class="method-tag font-mono font-xs text-cyan">MATHEMATICAL FORMULATION</span>
-            <h3>1. Transparent Evidence Weighting</h3>
-          </div>
-          <p>
-            Rather than relying on uninterpretable neural logits, each individual evidence snippet $i$ receives a deterministic score based on four verifiable dimensions:
-          </p>
-          <div class="code-box-formula font-mono">
-            W_i = Source_Reliability × Relevance × Freshness × Directness
-          </div>
-          <ul class="method-list font-xs">
-            <li><strong>Source Reliability ($R_s \in [0.1, 0.99]$):</strong> Calibrated by institutional accountability tier (Official Agency: 0.95+, Accredited Wire: 0.85+, Unverified Social: &lt;0.45).</li>
-            <li><strong>Relevance ($Rel \in [0, 1]$):</strong> Semantic cosine alignment between the assertion target and the excerpt context.</li>
-            <li><strong>Freshness ($F \in [0, 1]$):</strong> Exponential half-life decay based on time elapsed since publication.</li>
-            <li><strong>Directness ($D \in [0, 1]$):</strong> Measures whether the source provides primary sensor telemetry vs hearsay/amplification.</li>
-          </ul>
+      <!-- Core Principles -->
+      <section class="card p-6 mb-6">
+        <h3 class="font-base font-semibold mb-2">Design & Verification Philosophy</h3>
+        <p class="font-sm text-secondary mb-3">
+          During disasters, rumors spread faster than official bulletins. Traditional boolean "True/False" fact-checkers fail because claims often bundle partial facts (e.g. routine spillway gate release) with false catastrophic rumors (e.g. dam wall breach).
+        </p>
+        <p class="font-sm text-secondary">
+          CrisisLens AI decomposes claims into verifiable assertions, retrieves multi-tier evidence, calculates epistemic confidence and uncertainty, and enforces human-in-the-loop oversight when controversy is elevated.
+        </p>
+      </section>
+
+      <!-- Narrative Clusters: Simple Clean List (Requirement 10) -->
+      <section class="mb-6">
+        <div class="flex-center justify-between mb-3">
+          <h3 class="font-sm font-semibold text-secondary">Active Narrative Clusters</h3>
+          <span class="font-xs font-mono text-tertiary">${clusters.length} tracked clusters</span>
         </div>
 
-        <!-- Epistemic Uncertainty Model -->
-        <div class="glass-panel method-card">
-          <div class="method-card-header">
-            <span class="method-tag font-mono font-xs text-amber">EPISTEMIC UNCERTAINTY</span>
-            <h3>2. Confidence vs. Truth Probability</h3>
-          </div>
-          <p>
-            A common failure of commercial "AI checkers" is confusing epistemic certainty with truth value.
-          </p>
-          <div class="code-box-formula font-mono">
-            Controversy Index = 2 × min(Mass_Support, Mass_Contradict) / Total_Active_Mass
-          </div>
-          <ul class="method-list font-xs">
-            <li><strong>High Confidence + Contradicted:</strong> "We are 94% certain that this claim is factually false based on CWC sensor logs."</li>
-            <li><strong>Low Confidence + Unverified:</strong> "Only single-source social chatter exists; we lack sufficient data to make any claim."</li>
-            <li><strong>High Controversy:</strong> Triggers mandatory escalation to the Human Review Queue.</li>
-          </ul>
-        </div>
-
-        <!-- 5 Defensible Statuses -->
-        <div class="glass-panel method-card">
-          <div class="method-card-header">
-            <span class="method-tag font-mono font-xs text-emerald">STATUS ONTOLOGY</span>
-            <h3>3. Five Defensible Assessment States</h3>
-          </div>
-          <div class="status-def-list font-xs">
-            <div class="status-def-item">
-              <span class="status-badge SUPPORTED">SUPPORTED</span>
-              <span>Multiple independent authoritative sources confirm the factual assertions.</span>
+        <div class="clusters-simple-list">
+          ${clusters.map(c => `
+            <div class="cluster-simple-row card p-4">
+              <div class="cluster-top-line flex-center justify-between mb-1">
+                <h4 class="font-sm font-medium text-primary">${c.name}</h4>
+                <span class="status-badge ${c.status.replace(' ', '_')}">${c.status}</span>
+              </div>
+              <p class="font-xs text-secondary mb-2">"${c.dominantNarrative}"</p>
+              <div class="cluster-meta-clean font-xs text-tertiary flex-center gap-2">
+                <span>${c.claimCount} related claims</span>
+                <span>•</span>
+                <span>${c.velocity}</span>
+                <span>•</span>
+                <span>📍 ${c.geographicSpread}</span>
+              </div>
             </div>
-            <div class="status-def-item">
-              <span class="status-badge PARTIALLY_SUPPORTED">PARTIALLY SUPPORTED</span>
-              <span>Underlying crisis conditions verified, but details (e.g. breach or evacuation order) are exaggerated or unconfirmed.</span>
-            </div>
-            <div class="status-def-item">
-              <span class="status-badge CONTRADICTED">CONTRADICTED</span>
-              <span>Authoritative physical sensor logs or official agency records definitively disprove the claim.</span>
-            </div>
-            <div class="status-def-item">
-              <span class="status-badge UNVERIFIED">UNVERIFIED</span>
-              <span>Claim is actively circulating, but independent corroboration is currently pending.</span>
-            </div>
-            <div class="status-def-item">
-              <span class="status-badge INSUFFICIENT_EVIDENCE">INSUFFICIENT EVIDENCE</span>
-              <span>Zero credible telemetry or dispatch entries exist; epistemic confidence is insufficient for verdict.</span>
-            </div>
-          </div>
+          `).join('')}
+        </div>
+      </section>
+
+      <!-- Key Formulas & Defense -->
+      <section class="card p-6 mb-6 font-sm">
+        <h3 class="font-base font-semibold mb-3">Scoring & Epistemic Formulas</h3>
+        
+        <div class="formula-block mb-3 p-3 bg-subtle">
+          <span class="font-xs text-tertiary block font-mono mb-1">1. Evidence Score:</span>
+          <code>Score = Source Reliability × Relevance × Freshness × Directness</code>
         </div>
 
-        <!-- Privacy & Safety Protocol -->
-        <div class="glass-panel method-card">
-          <div class="method-card-header">
-            <span class="method-tag font-mono font-xs text-crimson">ETHICS & PRIVACY</span>
-            <h3>4. Privacy, Safety & Air-Gapped Demo</h3>
-          </div>
-          <p>
-            In compliance with hackathon guidelines, CrisisLens AI implements strict safety guardrails:
-          </p>
-          <ul class="method-list font-xs">
-            <li><strong>Zero Real PII:</strong> No real-world citizen phone numbers, private home coordinates, or medical identities are captured.</li>
-            <li><strong>Synthetic Telemetry:</strong> All crisis incidents utilize safe synthetic datasets based on public disaster blueprints.</li>
-            <li><strong>Explicit Tagging:</strong> Every view clearly states <code>SIMULATION DATA</code> to prevent accidental public misinformation.</li>
-            <li><strong>No Autonomous Action:</strong> Evacuation directives can only be issued by human authorities, never by AI alone.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- FAQ & Judging Defense -->
-      <section class="faq-section mt-8">
-        <div class="section-title-row">
-          <h3>Judge & Evaluator Technical Defense FAQ</h3>
-          <span class="font-mono font-xs text-tertiary">Direct Responses to Judging Criteria</span>
+        <div class="formula-block mb-3 p-3 bg-subtle">
+          <span class="font-xs text-tertiary block font-mono mb-1">2. Controversy Index:</span>
+          <code>Controversy = 2 × min(Support Mass, Contradict Mass) / Total Active Mass</code>
         </div>
 
-        <div class="faq-accordion glass-panel">
-          <div class="faq-item">
-            <h4 class="faq-q">Q1: How does CrisisLens prevent LLM hallucinations during life-or-death emergencies?</h4>
-            <p class="faq-a">
-              CrisisLens decouples text decomposition from evidence evaluation. The final status and confidence score are 
-              computed via deterministic mathematical equations based on retrieved sensor records and source reliability ratings. 
-              The AI never synthesizes unsupported facts or unverified citations out of thin air.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h4 class="faq-q">Q2: How does the system handle rapid contradictions when disaster reports break?</h4>
-            <p class="faq-a">
-              As demonstrated in our Live Crisis Simulation, assessments are temporal streams rather than static classifications. 
-              When an official sensor report arrives, the Controversy Index surges, triggering human review and updating the net balance 
-              from UNVERIFIED to CONTRADICTED in real-time.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h4 class="faq-q">Q3: Why not just use a standard True/False LLM prompt?</h4>
-            <p class="faq-a">
-              Binary labels are catastrophic during crises. A claim like "Dam water is gushing; evacuate immediately" often contains 
-              a factual grain of truth (water is indeed being released via spillways) combined with a false panic assertion (the dam has not breached). 
-              A binary label either creates panic or dismisses real riverbank precautions. Decomposition into assertions resolves this.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h4 class="faq-q">Q4: How does CrisisLens scale to live production?</h4>
-            <p class="faq-a">
-              The <code>SourceProvider</code> layer is strictly abstracted. The mock layer can be swapped with live GDACS (Global Disaster Alert and Coordination System), 
-              NDMA CAP feeds (Common Alerting Protocol), and official Twitter API firehoses with zero changes to the core scoring or provenance DAG engines.
-            </p>
-          </div>
+        <div class="formula-block p-3 bg-subtle">
+          <span class="font-xs text-tertiary block font-mono mb-1">3. Location-Aware Priority:</span>
+          <code>Priority = 0.40 × Proximity + 0.25 × Severity + 0.20 × Uncertainty + 0.15 × Recency</code>
+          <span class="font-xs text-secondary block mt-1"><em>Distance affects priority and dispatch urgency, not factual truth.</em></span>
         </div>
+      </section>
+
+      <!-- Privacy & Guardrails -->
+      <section class="card p-6 mb-8 font-xs text-secondary">
+        <h4 class="font-sm font-semibold text-primary mb-2">Privacy & Synthetic Data Safety</h4>
+        <p class="mb-2">
+          • <strong>Zero Coordinate Storage:</strong> User coordinates are used purely in memory to compute distance and are never saved to localStorage or external servers.
+        </p>
+        <p class="mb-2">
+          • <strong>Safe Synthetic Dataset:</strong> All crisis scenarios are synthetic simulations based on official emergency disaster response blueprints. Zero personal phone numbers or private addresses are stored.
+        </p>
+        <p>
+          • <strong>Decision Support:</strong> AI advises and structures evidence; evacuation directives are issued only by official civil defense authorities.
+        </p>
       </section>
     </div>
   `;

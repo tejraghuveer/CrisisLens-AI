@@ -14,7 +14,7 @@ import { locationService } from '../services/locationService.js';
 
 class StateStore {
   constructor() {
-    this.currentView = 'landing'; // landing, verify, result, dashboard, clusters, review, simulation, methodology
+    this.currentView = 'verify'; // verify (primary), result, dashboard, review, simulation, about/methodology
     this.sourceProvider = new MockSourceProvider(450);
     this.narrativeClusterer = new NarrativeClusterer();
     
